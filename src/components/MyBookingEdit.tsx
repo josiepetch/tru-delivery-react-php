@@ -1,0 +1,192 @@
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import Breadcrump from './Breadcrump';
+import { AuthContext } from "../contexts/AuthContext";
+import { formatDate } from "../common/dateTime"
+
+const MyBookingEdit = () => {
+    const { decodedToken } = useContext(AuthContext);
+
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const handleLink = (target: string): void => {
+        navigate(`/${target}`);
+    };
+
+    const [responseData, setResponseData] = useState(null);
+    const [isBtnLoading, setIsBtnLoading] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_delivery.php`, {
+                action: 'getbooking',
+                id
+            });
+            setResponseData(response.data.result);
+            console.log(response.data)
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const [holidays, setHolidays] = useState([]);
+    
+    const fetchHoliday = async () => {
+        try {
+            const response = await fetch('/holiday.json');
+            const jsonData = await response.json();
+
+            const holidayDates = jsonData.map(holiday => holiday.date);
+
+            setHolidays(holidayDates);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+        fetchHoliday();
+    }, []);
+
+    const currentDate = new Date();
+    const minDate = new Date();
+    minDate.setDate(currentDate.getDate() + 1); // Set the minimum date to tomorrow
+
+    const isDayOff = (date) => {
+        
+        const day = date.getDay();
+        if (day === 0 || day === 6) { // It's a weekend
+            return false;
+        }
+
+        // Check if the selected date is a holiday
+        const formattedDate = formatDate(date);
+        return !holidays.includes(formattedDate);
+
+    };
+
+    const handleInputChange = (e, field) => {
+        setResponseData((prevData) => ({
+            ...prevData,
+            [field]: e.target.value,
+        }));
+    };
+    const handleDataChange = (e, field) => {
+        setResponseData((prevData) => ({
+            ...prevData,
+            [field]: e,
+        }));
+    };
+    const handleDateChange = (date, field) => {
+        setResponseData((prevData) => ({
+            ...prevData,
+            [field]: date,
+        }));
+    };
+    const handleSubmit = () => {
+        try {
+            setIsBtnLoading(true);
+            axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_delivery.php`, {
+                action: 'updatebooking',
+                sid: parseInt(decodedToken.id, 10),
+                id,
+                po_number: responseData.po_number,
+                booktime: responseData.booktime,
+                item: responseData.item,
+                type: responseData.type,
+                note: responseData.note,
+            }).then(function(response){
+                if (response.data.status === 200) {
+                    navigate('/mybooking', { state: { message: `Booking updated successfully!` } });
+                } else {
+                    console.error('Booking update failed');
+                }
+            });
+        } catch (error) {
+            console.error('An error occurred during login:', error);
+        }
+        setIsBtnLoading(false);
+    };
+
+    return (
+        <>
+            <Breadcrump />
+
+            <h2 className='text-center mb-4'>Edit Booking</h2>
+
+            {responseData ? (
+                <div className="row">
+                    <div className="col"></div>
+
+                    <div className="col-md-6 col-xs-12">
+                        <div className='input-container'>
+                            <input type="text" id="ponumber" name='ponumber'
+                            value={responseData.po_number}
+                            onChange={(e) => handleInputChange(e, 'po_number')} />
+                            <label>PO Number</label>
+                        </div>
+
+                        <div className='input-container'>
+                            <DatePicker
+                                id="datetime"
+                                name='datetime'
+                                showTimeSelect
+                                selected={new Date(responseData.booktime)}
+                                onChange={(e) => handleDateChange(e, 'booktime')}
+                                minDate={minDate}
+                                minTime={new Date().setHours(9, 0)}
+                                maxTime={new Date().setHours(16, 0)}
+                                filterDate={isDayOff}
+                                dateFormat="d MMMM yyyy h:mm"
+                            />
+                            <label>Date and Time</label>
+                        </div>
+
+                        <div className='input-container'><div className='row'>
+                            <div className="col">
+                                <input type="number" id="item" name='item'
+                                value={responseData.item}
+                                onChange={(e) => handleInputChange(e, 'item')} />
+                                <label>Item</label>
+                            </div>
+                            <div className="col">
+                            <select id='type' name='type' value={responseData.type}
+                            onChange={(e) => handleDataChange(e.target.value, 'type')} >
+                                <option value="1">Palet</option>
+                                <option value="2">Carlton</option>
+                            </select>
+                            </div>
+                        </div></div>
+
+                        <div className='input-container'>
+                            <textarea id='note' name='note'value={responseData.note}
+                            onChange={(e) => handleDataChange(e.target.value, 'note')}></textarea>
+                            <label>Note</label>
+                        </div>
+
+                        <div className='input-container'><div className='row'>
+                            <div className="col">
+                                <button type="button" className="btn btn-fullwidth btn-blue" disabled={isBtnLoading} onClick={handleSubmit}>
+                                    {isBtnLoading ? 'Updating in...' : 'Update'}
+                                </button>
+                            </div>
+                            <div className="col">
+                                <button className="btn btn-fullwidth btn-darkgray" onClick={() => handleLink('mybooking')}>Cancel</button>
+                            </div>
+                        </div></div>
+                    </div>
+
+                    <div className="col"></div>
+                </div>
+                ) : (
+                <p>Loading...</p>
+            )}
+        </>
+    )
+}
+
+export default MyBookingEdit

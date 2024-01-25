@@ -1,0 +1,195 @@
+.btn-clear {
+    background: none;
+    border: none;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.container {
+    margin: 5.5rem auto 5rem auto;
+
+    .separator {
+        margin: 1rem 0 2rem 0;
+
+        span {
+            margin-left: 2%;
+        }
+    
+        .separator-left {
+            width: 46%;
+            float: left;
+        }
+        .separator-right {
+            width: 46%;
+            float: right;
+        }
+    }
+
+    .input-container {
+        position: relative;
+        margin-bottom: 15px;
+
+        .react-datepicker-wrapper {
+            width: 100%;
+        }
+
+        input,
+        textarea,
+        select {
+            padding: 8px 10px 8px 35px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 100%;
+        }
+
+        label {
+            position: absolute;
+            top: -12px;
+            left: 5px;
+            padding: 0 5px;
+            background-color: white;
+            color: #999;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .icon {
+            box-sizing: border-box; display: flex; align-items: stretch; flex-direction: column; 
+            flex-shrink: 0; border-style: solid; border-width: 0px; position: absolute; z-index: 0; 
+            min-height: 0px; min-width: 0px; align-self: center; height: 20px; left: 8px; top: 8px;
+        }
+
+        .icon img {
+            width: 23px;
+        }
+
+        dl {
+            display: flex;
+
+            dd {
+                flex: 1;
+            }
+        }
+    }
+
+    table {
+        td {
+            .input-container {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    dl.flex {
+        display: flex;
+    }
+
+    #menu {
+        width: 230px;
+        // height: 80%;
+        position: fixed;
+        z-index: 200;
+        text-align: center;
+        color: var(--blue);
+
+        #menu-mobile-title {
+            display: none;
+        }
+
+        div {
+            margin: 0.5rem 0;
+            a {
+                cursor: pointer;
+                padding: 0.5rem 0;
+            }
+        }
+
+        .active {
+            background-color: var(--blue);
+            color: var(--white);
+
+            a {
+                color: inherit;
+            }
+        }
+
+        .menu-list {
+            height: 100%;
+        }
+    }
+
+    #content {
+        padding-left: 250px;
+    }
+
+    @media only screen and (max-width: 900px) {
+        #menu {
+            width: 100%;
+            height: auto;
+            position: relative;
+            background-color: var(--white);
+
+            #menu-mobile-title {
+                display: block;
+                padding: 10px 0;
+            }
+
+            .visible {
+                display: block;
+            }
+            .hidden {
+                display: none;
+            }
+
+            .menu-list {
+                .btn-logout {
+                    position: relative;
+                }
+            }
+        }
+
+        #content {
+            padding-left: 0;
+        }
+
+        .separator {
+            span {
+                margin-left: 1%;
+            }
+        }
+    }
+}
+
+.header {
+    color: var(--white);
+    width: 100%;
+    position: fixed;
+    top: 1px;
+    z-index: 999;
+
+    .container {
+        margin: 0 auto;
+        padding: 0.5rem 0;
+
+        img {
+            max-width: 230px;
+        }
+    }
+}
+
+.footer {
+    color: var(--white);
+    width: 100%;
+    position: fixed;
+    bottom: 1px;
+
+    .container {
+        margin: 0 auto;
+
+        img {
+            max-width: 150px;
+        }
+    }
+}

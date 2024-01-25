@@ -1,0 +1,106 @@
+:root {
+    --black: #000;
+    --blue: #0170CC;
+    --gray: #f0f0f0;
+    --darkgray: #c0c0c0;
+    --red: #D30044;
+    --white: #FFF;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.fullwidth {
+    width: 100%;
+}
+
+
+.bg-blue,
+.bg-blue:hover {
+    background-color: var(--blue);
+    color: var(--white);
+}
+.bg-darkgray,
+.bg-darkgray:hover {
+    background-color: var(--darkgray);
+}
+.bg-link-blue,
+.bg-link-blue:hover {
+    color: var(--blue);
+}
+.bg-link-black,
+.bg-link-black:hover {
+    color: var(--black);
+}
+
+.btn-fullwidth {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.btn-red,
+.btn-red:hover {
+    background-color: var(--red);
+    color: var(--white);
+}
+.btn-blue,
+.btn-blue:hover {
+    background-color: var(--blue);
+    color: var(--white);
+}
+.btn-darkgray,
+.btn-darkgray:hover {
+    background-color: var(--darkgray);
+}
+
+.font-blue,
+.font-blue:hover {
+    color: var(--blue);
+}
+
+.font-red,
+.font-red:hover {
+    color: var(--red);
+}
+
+.navbar a {
+    color: var(--white);
+}
+
+.form-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+}
+
+.react-calendar {
+    width: 100%;
+}
+.box-time ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+.box-time ul li {
+    padding: 8px;
+    margin: 5px;
+    background-color: var(--gray);
+    text-align: center;
+}
+
+.box-gray-border {
+    background-color: var(--gray);
+    border: 1px solid var(--darkgray);
+}
+.box-gray-border-nofill {
+    border: 1px solid var(--darkgray);
+}
+
+.round-top-right {
+    border-radius: 10px 10px 0 10px;
+}
+.round-top-left {
+    border-radius: 10px 10px 10px 0;
+}

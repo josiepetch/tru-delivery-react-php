@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Breadcrump from "./Breadcrump";
-import { AuthContext } from "../contexts/AuthContext";
+import { tokenSupplierId } from '../common/authUtils';
 
 const MyEnquiry = () => {
-    const { decodedToken } = useContext(AuthContext);
 
-    const [responseData, setResponseData] = useState(null);
-    const [displayedMessage, setDisplayedMessage] = useState(null);
+    const [responseData, setResponseData] = useState<any[]>([]);
+    const [displayedMessage, setDisplayedMessage] = useState<string | null>(null);
+    const supplierId = tokenSupplierId()
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -22,7 +22,7 @@ const MyEnquiry = () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_enquiry.php`, {
                 action: 'myenquiry',
-                sid: parseInt(decodedToken.id, 10)
+                sid: supplierId
             });
             setResponseData(response.data.result);
         } catch (error) {
@@ -63,7 +63,7 @@ const MyEnquiry = () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_enquiry.php`, {
                 action: 'searchTerm',
-                sid: parseInt(decodedToken.id, 10),
+                sid: supplierId,
                 search
             });
 

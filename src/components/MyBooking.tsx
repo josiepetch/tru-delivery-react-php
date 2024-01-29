@@ -1,15 +1,15 @@
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Breadcrump from './Breadcrump';
-import { AuthContext } from "../contexts/AuthContext";
+import { tokenSupplierId } from '../common/authUtils';
 
 const MyBooking = () => {
-    const { decodedToken } = useContext(AuthContext);
 
-    const [responseData, setResponseData] = useState('');
-    const [expandedItemId, setExpandedItemId] = useState('');
-    const [displayedMessage, setDisplayedMessage] = useState('');
+    const [responseData, setResponseData] = useState<any[]>([]);
+    const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
+    const [displayedMessage, setDisplayedMessage] = useState<string | null>(null);
+    const supplierId = tokenSupplierId()
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -52,9 +52,9 @@ const MyBooking = () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_delivery.php`, {
                 action: 'mybooking',
-                sid: parseInt(decodedToken.id, 10)
+                sid: supplierId
             });
-            setResponseData(response.data);
+            setResponseData(response.data.result);
         } catch (error) {
             console.error(error);
         }
@@ -93,9 +93,9 @@ const MyBooking = () => {
                     <th>NO. Item(s)</th>
                     <th></th>
                 </tr></thead>
-                {responseData && responseData.result ? (
+                {responseData ? (
                     <><tbody>
-                        {responseData.result.map((item) => (
+                        {responseData.map((item) => (
                             <Fragment key={item.id}>
                                 <tr>
                                     <td>{item.format_booktime}</td>
@@ -116,7 +116,7 @@ const MyBooking = () => {
                             
                                 {expandedItemId === item.id && (
                                     <tr>
-                                        <td colSpan="4">
+                                        <td colSpan={4}>
                                             <hr />
                                             <p>Duration: {item.duration} mins</p>
                                             <p>Note: {item.note}</p>

@@ -1,17 +1,16 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Breadcrump from "./Breadcrump";
-import { AuthContext } from "../contexts/AuthContext";
+// import { tokenSupplierId } from '../common/authUtils';
 
 const MyEnquiryEdit = () => {
 
-    const { decodedToken } = useContext(AuthContext);
-
     const { id } = useParams();
-    const [enquiry, setEnquiry] = useState(null);
-    const [responseData, setResponseData] = useState(null);
+    const [enquiry, setEnquiry] = useState<string | null>(null);
+    const [responseData, setResponseData] = useState<any[]>([]);
     const [isBtnLoading, setIsBtnLoading] = useState(false);
+    // const supplierId = tokenSupplierId()
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {

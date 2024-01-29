@@ -1,29 +1,27 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from "../../common/authUtils";
 import { copyToClipboard, generateRandomPassword } from "../../common/password"
 
 const AdminEdit = () => {
-
-    const { decodedAccessToken } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
         navigate(`/admin/${target}`);
     };
 
-    useEffect(() => {
-        if (!decodedAccessToken) {
-            handleLink('login')
-        }
-    });
-
     const { id } = useParams();
     const [password, setPassword] = useState('');
     const [length, setLength] = useState(12);
-    const [responseData, setResponseData] = useState(null);
+    interface ResponseData {
+        username: string;
+    }
+    const [responseData, setResponseData] = useState<ResponseData>({
+        username: '',
+    });
+    const adminId = tokenAdminId()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,7 +29,7 @@ const AdminEdit = () => {
                 const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                     action: 'getAdminDetail',
                     id,
-                    aid: parseInt(decodedAccessToken.id, 10)
+                    aid: adminId
                 });
                 console.log(response.data.result)
                 setResponseData(response.data.result);
@@ -54,7 +52,7 @@ const AdminEdit = () => {
         try {
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                 action: 'updateAdmin',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 password
             }).then(function(response){

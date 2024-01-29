@@ -1,22 +1,21 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from "../../common/authUtils";
 
 const Supplier = () => {
-
-    const { decodedAccessToken } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
         navigate(`/admin/${target}`);
     };
 
-    const [expandedItemId, setExpandedItemId] = useState('');
+    const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
     const returnMessage = useLocation();
     const displayMessage = returnMessage.state?.message;
     const [displayedMessage, setDisplayedMessage] = useState('');
+    
     useEffect(() => {
         if (displayMessage) {
             setDisplayedMessage(displayMessage);
@@ -30,15 +29,15 @@ const Supplier = () => {
         }
     }, []);
 
-    const [password, setPassword] = useState('');
     const [length, setLength] = useState(12);
-    const [responseData, setResponseData] = useState(null);
+    const [responseData, setResponseData] = useState<any[]>([]);
+    const adminId = tokenAdminId()
 
     const fetchData = async () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_supplier.php`, {
                 action: 'getSupplierList',
-                aid: parseInt(decodedAccessToken.id, 10)
+                aid: adminId
             });
             setResponseData(response.data.result);
         } catch (error) {
@@ -46,9 +45,9 @@ const Supplier = () => {
         }
     }
 
-    const handleClick = (id: null) => {
-      setExpandedItemId((prevId) => (prevId === id ? null : id));
-    };
+    const handleClick = (id: number | null) => {
+      setExpandedItemId((prevId : number | null) => (prevId === id ? null : id));
+  };
 
     const setSearchTerm = async (search : string) => {
       try {
@@ -67,7 +66,7 @@ const Supplier = () => {
         try {
             await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_supplier.php`, {
                 action: 'deletSupplier',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 email
             });
@@ -89,7 +88,7 @@ const Supplier = () => {
       try {
           axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_supplier.php`, {
               action: 'supplierResetPassword',
-              aid: parseInt(decodedAccessToken.id, 10),
+              aid: adminId,
               id,
               length
           }).then(function(response){

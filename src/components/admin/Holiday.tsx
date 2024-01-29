@@ -1,16 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from "../../common/authUtils";
 
 const Holiday = () => {
 
-    const { decodedAccessToken } = useContext(AuthContext);
-
-    const [editModes, setEditModes] = useState({});
-    const [newTitle, setNewTitle] = useState(null);
-    const [newDate, setNewDate] = useState(null);
+    const [editModes, setEditModes] = useState<any[]>([]);
+    const [newTitle, setNewTitle] = useState<any | null>(null);
+    const [newDate, setNewDate] = useState<any | null>(null);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -34,13 +32,14 @@ const Holiday = () => {
         }
     }, []);
 
-    const [responseData, setResponseData] = useState(null);
+    const [responseData, setResponseData] = useState<any[]>([]);
+    const adminId = tokenAdminId()
 
     const fetchData = async () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_holiday.php`, {
                 action: 'getHolidayList',
-                aid: parseInt(decodedAccessToken.id, 10)
+                aid: adminId
             });
             setResponseData(response.data.result);
         } catch (error) {
@@ -76,7 +75,7 @@ const Holiday = () => {
         try {
             await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_holiday.php`, {
                 action: 'deleteHoliday',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 title
             });
@@ -93,7 +92,7 @@ const Holiday = () => {
 
         axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_holiday.php`, {
           action: 'editHolidayTitle',
-          aid: parseInt(decodedAccessToken.id, 10),
+          aid: adminId,
           id,
           title,
           date,

@@ -1,12 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from '../../common/authUtils';
 
 const EnquiryEdit = () => {
-
-    const { decodedAccessToken } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -15,8 +13,9 @@ const EnquiryEdit = () => {
 
     const { id } = useParams();
     const [enquiry, setEnquiry] = useState('');
-    const [responseData, setResponseData] = useState(null);
+    const [responseData, setResponseData] = useState<any[]>([]);
     const [isBtnLoading, setIsBtnLoading] = useState(false);
+    const adminId = tokenAdminId()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,7 +24,7 @@ const EnquiryEdit = () => {
                 const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_enquiry.php`, {
                     action: 'getEnquiryDetail',
                     id,
-                    aid: parseInt(decodedAccessToken.id, 10)
+                    aid: adminId
                 });
                 console.log(response.data.result)
                 setResponseData(response.data.result);
@@ -43,7 +42,7 @@ const EnquiryEdit = () => {
             setIsBtnLoading(true);
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_enquiry.php`, {
                 action: 'updateEnquiryDetail',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 enquiry
             }).then(function(response){

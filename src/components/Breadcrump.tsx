@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
+import { tokenSupplierExpired } from "../common/authUtils";
 
 const Breadcrump = () => {
 
@@ -10,17 +10,20 @@ const Breadcrump = () => {
         navigate(`/${target}`);
     };
 
-    const { decodedToken } = useContext(AuthContext);
-    console.log(decodedToken.expired)
-
     const handleLogout = (): void => {
         localStorage.removeItem("token");
         navigate('/login');
     };
-
-    if (!localStorage.getItem('token') ||  (`decodedToken.expired`) >= (`now`)) {
-        handleLogout()
-    }    
+ 
+    useEffect(() => {
+        const sessionExpired = tokenSupplierExpired();
+        const now = new Date();
+        
+        if (!localStorage.getItem('token') || (sessionExpired && sessionExpired > now)) {
+            handleLogout();
+            return;
+        }
+    }, []);
 
     // mobile menu
     const [isMenuVisible, setMenuVisibility] = useState(false);

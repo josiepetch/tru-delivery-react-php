@@ -1,27 +1,30 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrump from './Breadcrump';
-import { AuthContext } from "../contexts/AuthContext";
 import { formatDate } from "../common/dateTime"
+import { tokenSupplierId } from '../common/authUtils';
 
 const MyBookingInsert = () => {
-    const { decodedToken } = useContext(AuthContext);
 
-    const currentPath = location.pathname;
+    // const currentPath = location.pathname;
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
         navigate(`/${target}`);
     };
 
-    const [holidays, setHolidays] = useState([]);
+    
+    interface Holiday {
+        date: Date;
+    }
+    const [holidays, setHolidays] = useState<any[]>([]);
     
     const fetchData = async () => {
         try {
             const response = await fetch('../../public/holiday.json');
-            const jsonData = await response.json();
+            const jsonData: Holiday[] = await response.json();
 
             const holidayDates = jsonData.map(holiday => holiday.date);
 
@@ -34,17 +37,24 @@ const MyBookingInsert = () => {
         fetchData();
     }, []);
 
+    const supplierId = tokenSupplierId()
     const [isBtnLoading, setIsBtnLoading] = useState(false);
-    const [ponumber, setPonumber] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [item, setItem] = useState(null);
-    const [typenum, setTypenum] = useState(null);
-    const [note, setNote] = useState(null);
+    const [ponumber, setPonumber] = useState<any | null>(null);
+    const [selectedDate, setSelectedDate] = useState<any | null>(null);
+    const [item, setItem] = useState<any | null>(null);
+    const [typenum, setTypenum] = useState<any | null>(null);
+    const [note, setNote] = useState<any | null>(null);
     const currentDate = new Date();
-    const minDate = new Date();
+    const minDate = new Date(currentDate);
     minDate.setDate(currentDate.getDate() + 1); // Set the minimum date to tomorrow
+    // Set minimum time to 9:00 AM
+    const minTime = new Date(currentDate);
+    minTime.setHours(9, 0, 0, 0);
+    // Set maximum time to 4:00 PM
+    const maxTime = new Date(currentDate);
+    maxTime.setHours(16, 0, 0, 0);
 
-    const isDayOff = (date) => {
+    const isDayOff = (date : any) => {
         
         const day = date.getDay();
         if (day === 0 || day === 6) { // It's a weekend
@@ -54,7 +64,6 @@ const MyBookingInsert = () => {
         // Check if the selected date is a holiday
         const formattedDate = formatDate(date);
         return !holidays.includes(formattedDate);
-
     };
 
     const handleDateSelect = (date: Date) => {
@@ -68,7 +77,7 @@ const MyBookingInsert = () => {
                 setIsBtnLoading(true);
                 axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_delivery.php`, {
                     action: 'insertbooking',
-                    sid: parseInt(decodedToken.id, 10),
+                    sid: supplierId,
                     ponumber,
                     selectedDate,
                     item,
@@ -109,18 +118,18 @@ const MyBookingInsert = () => {
                 </div>
 
                 <div className='input-container'>
-                    <DatePicker
-                        id="datetime"
-                        name='datetime'
-                        selected={selectedDate}
-                        onChange={handleDateSelect}
-                        showTimeSelect
-                        minDate={minDate}
-                        minTime={new Date().setHours(9, 0)}
-                        maxTime={new Date().setHours(16, 0)}
-                        filterDate={isDayOff}
-                        dateFormat="d MMMM yyyy h:mm"
-                    />
+                <DatePicker
+                    id="datetime"
+                    name='datetime'
+                    selected={selectedDate}
+                    onChange={handleDateSelect}
+                    showTimeSelect
+                    minDate={minDate}
+                    minTime={minTime}
+                    maxTime={maxTime}
+                    filterDate={isDayOff}
+                    dateFormat="d MMMM yyyy h:mm"
+                />
                     <label>Date and Time</label>
                 </div>
 

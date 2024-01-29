@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminExpired } from '../../common/authUtils';
 
 const Navbar = () => {
 
@@ -10,17 +10,18 @@ const Navbar = () => {
         navigate(`/admin/${target}`);
     }
 
-    const { decodedAccessToken } = useContext(AuthContext);
-    console.log(decodedAccessToken)
-
     const handleLogout = () => {
         localStorage.removeItem("access_token");
         handleLink('login');
     };
 
     useEffect(() => {
-        if (!localStorage.getItem('access_token') || (`decodedAccessToken.expired`) >= (`now`)) {
-            handleLogout()
+        const sessionExpired = tokenAdminExpired();
+        const now = new Date();
+        
+        if (!localStorage.getItem('access_token') || (sessionExpired && sessionExpired > now)) {
+            handleLogout();
+            return;
         }
     }, []);
 

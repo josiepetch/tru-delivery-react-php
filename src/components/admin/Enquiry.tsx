@@ -1,19 +1,18 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AuthContext } from "../../contexts/AuthContext";
 import Navbar from "./Navbar"
+import { tokenAdminId } from '../../common/authUtils';
 
 const Enquiry = () => {
-
-  const { decodedAccessToken } = useContext(AuthContext);
 
   const navigate = useNavigate();
   const handleLink = (target: string): void => {
       navigate(`/admin/${target}`);
   };
 
-  const [responseData, setResponseData] = useState(null);
+  const [responseData, setResponseData] = useState<any[]>([]);
+  const adminId = tokenAdminId()
 
   useEffect(() => {
     fetchData();
@@ -23,7 +22,7 @@ const Enquiry = () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_enquiry.php`, {
           action: 'getEnquiryList',
-          aid: parseInt(decodedAccessToken.id, 10)
+          aid: adminId
       });
       setResponseData(response.data.result);
     } catch (error) {

@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrump from './Breadcrump';
-import { AuthContext } from "../contexts/AuthContext";
 import { formatDate } from "../common/dateTime"
+import { tokenSupplierId } from '../common/authUtils';
 
 const MyBookingEdit = () => {
-    const { decodedToken } = useContext(AuthContext);
 
     const { id } = useParams();
     const navigate = useNavigate();
@@ -16,8 +15,22 @@ const MyBookingEdit = () => {
         navigate(`/${target}`);
     };
 
-    const [responseData, setResponseData] = useState(null);
+    interface ResponseData {
+        po_number: string;
+        booktime: Date;
+        item: number;
+        type: number;
+        note: string;
+    }
+    const [responseData, setResponseData] = useState<ResponseData>({
+        po_number: '',
+        booktime: new Date(),
+        item: 0,
+        type: 0,
+        note: '',
+    });
     const [isBtnLoading, setIsBtnLoading] = useState(false);
+    const supplierId = tokenSupplierId()
 
     const fetchData = async () => {
         try {
@@ -32,12 +45,15 @@ const MyBookingEdit = () => {
         }
     };
 
-    const [holidays, setHolidays] = useState([]);
+    interface Holiday {
+        date: Date;
+    }
+    const [holidays, setHolidays] = useState<any[]>([]);
     
     const fetchHoliday = async () => {
         try {
             const response = await fetch('/holiday.json');
-            const jsonData = await response.json();
+            const jsonData: Holiday[] = await response.json();
 
             const holidayDates = jsonData.map(holiday => holiday.date);
 
@@ -53,10 +69,16 @@ const MyBookingEdit = () => {
     }, []);
 
     const currentDate = new Date();
-    const minDate = new Date();
+    const minDate = new Date(currentDate);
     minDate.setDate(currentDate.getDate() + 1); // Set the minimum date to tomorrow
+    // Set minimum time to 9:00 AM
+    const minTime = new Date(currentDate);
+    minTime.setHours(9, 0, 0, 0);
+    // Set maximum time to 4:00 PM
+    const maxTime = new Date(currentDate);
+    maxTime.setHours(16, 0, 0, 0);
 
-    const isDayOff = (date) => {
+    const isDayOff = (date : any) => {
         
         const day = date.getDay();
         if (day === 0 || day === 6) { // It's a weekend
@@ -69,19 +91,19 @@ const MyBookingEdit = () => {
 
     };
 
-    const handleInputChange = (e, field) => {
+    const handleInputChange = (e:any, field:string) => {
         setResponseData((prevData) => ({
             ...prevData,
             [field]: e.target.value,
         }));
     };
-    const handleDataChange = (e, field) => {
+    const handleDataChange = (e:any, field:string) => {
         setResponseData((prevData) => ({
             ...prevData,
             [field]: e,
         }));
     };
-    const handleDateChange = (date, field) => {
+    const handleDateChange = (date:Date|null, field:string) => {
         setResponseData((prevData) => ({
             ...prevData,
             [field]: date,
@@ -92,7 +114,7 @@ const MyBookingEdit = () => {
             setIsBtnLoading(true);
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_delivery.php`, {
                 action: 'updatebooking',
-                sid: parseInt(decodedToken.id, 10),
+                sid: supplierId,
                 id,
                 po_number: responseData.po_number,
                 booktime: responseData.booktime,
@@ -138,8 +160,8 @@ const MyBookingEdit = () => {
                                 selected={new Date(responseData.booktime)}
                                 onChange={(e) => handleDateChange(e, 'booktime')}
                                 minDate={minDate}
-                                minTime={new Date().setHours(9, 0)}
-                                maxTime={new Date().setHours(16, 0)}
+                                minTime={minTime}
+                                maxTime={maxTime}
                                 filterDate={isDayOff}
                                 dateFormat="d MMMM yyyy h:mm"
                             />

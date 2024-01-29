@@ -1,12 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Breadcrump from "./Breadcrump"
-import { AuthContext } from "../contexts/AuthContext";
+import { tokenSupplierId } from '../common/authUtils';
 
 const MyEnquiryInsert = () => {
-
-    const { decodedToken } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -15,13 +13,14 @@ const MyEnquiryInsert = () => {
 
     const [enquiry, setEnquiry] = useState<string>('');
     const [isBtnLoading, setIsBtnLoading] = useState(false);
+    const supplierId = tokenSupplierId()
 
     const handleSubmit = () => {
         try {
             setIsBtnLoading(true);
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_enquiry.php`, {
                 action: 'newenquiry',
-                sid: parseInt(decodedToken.id, 10),
+                sid: supplierId,
                 enquiry,
             }).then(function(response){
                 if (response.data.status === 200) {

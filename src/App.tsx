@@ -32,19 +32,28 @@ import HolidayInsert from "./components/admin/HolidayInsert";
 import Supplier from "./components/admin/Supplier";
 import SupplierInsert from "./components/admin/SupplierInsert";
 
+interface DecodedToken {
+  id: number;
+  expired: Date;
+}
+interface DecodedAccessToken {
+  id: number;
+  expired: Date;
+}
+
 function App() {
 
-  const [decodedToken, setDecodedToken] = useState<object | null>(null);
-  const [decodedAccessToken, setDecodedAccessToken] = useState<object | null>(null);
+  const [decodedToken, setDecodedToken] = useState<DecodedToken | null>(null);
+  const [decodedAccessToken, setDecodedAccessToken] = useState<DecodedAccessToken | null>(null);
 
   useEffect(() => {
-    const localDecodedToken = getAndDecodeToken();
+    const localDecodedToken = getAndDecodeToken() as DecodedToken | null;
     if (localDecodedToken) {
       setDecodedToken(localDecodedToken)
     }
   }, []);
   useEffect(() => {
-    const localDecodedAccessToken = getAndDecodeAccessToken();
+    const localDecodedAccessToken = getAndDecodeAccessToken() as DecodedAccessToken | null;
     if (localDecodedAccessToken) {
       setDecodedAccessToken(localDecodedAccessToken)
     }
@@ -57,7 +66,7 @@ function App() {
 
       <div className="container">
         {/* frontend */}
-        <AuthContext.Provider value={{decodedToken}}>
+        <AuthContext.Provider value={{ decodedToken }}>
           <Router>
             <Routes>
               <Route path="/" element={<Login />} />
@@ -76,7 +85,7 @@ function App() {
         </AuthContext.Provider>
 
         {/* backend */}
-        <AuthContext.Provider value={{decodedAccessToken}}>
+        <AuthContext.Provider value={{ decodedAccessToken }}>
           <Router>
             <Routes>
               <Route path="/admin" element={<AdminLogin />} />

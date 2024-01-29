@@ -1,27 +1,20 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from "../../common/authUtils";
 
 const AdminInsert = () => {
-
-    const { decodedAccessToken } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
         navigate(`/admin/${target}`);
     };
 
-    useEffect(() => {
-        if (!decodedAccessToken) {
-            handleLink('login')
-        }
-    });
-
     const [username, setUsername] = useState('');
     const [length, setLength] = useState(12);
     const [isValidUsername, setIsValidUsername] = useState(true);
+    const adminId = tokenAdminId()
 
     const handleIncrease = (index : number) => {
         setLength(length+index)
@@ -30,7 +23,7 @@ const AdminInsert = () => {
         setLength(length-index)
     }
 
-    const handleUsernameChange = (e) => {
+    const handleUsernameChange = (e : any) => {
         const newUsername = e.target.value;
         setUsername(newUsername);
     
@@ -43,7 +36,7 @@ const AdminInsert = () => {
         try {
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                 action: 'insertAdmin',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 username,
                 length
             }).then(function(response){

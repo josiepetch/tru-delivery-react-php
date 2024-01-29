@@ -1,15 +1,15 @@
-import { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from "../../common/authUtils";
 
 const HolidayInsert = () => {
-    const { decodedAccessToken } = useContext(AuthContext);
 
-    const [title, setTitle] = useState(null);
-    const [date, setDate] = useState(null);
+    const [title, setTitle] = useState('');
+    const [date, setDate] = useState('');
     const [isBtnLoading, setIsBtnLoading] = useState(false);
+    const adminId = tokenAdminId()
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -21,7 +21,7 @@ const HolidayInsert = () => {
             setIsBtnLoading(true);
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_holiday.php`, {
                 action: 'insertHoliday',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 title,
                 date,
             }).then(function(response){

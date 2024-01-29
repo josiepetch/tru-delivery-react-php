@@ -1,25 +1,18 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/AuthContext";
+import { useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar"
+import { tokenAdminId } from "../../common/authUtils";
 import axios from "axios";
 
 const Dashboard = () => {
 
-  const { decodedAccessToken } = useContext(AuthContext);
+  // const navigate = useNavigate();
+  // const handleLink = (target: string): void => {
+  //   navigate(`/admin/${target}`);
+  // };
 
-  useEffect(() => {
-    if (!decodedAccessToken) {
-      handleLink('login')
-    }
-  });
-
-  const navigate = useNavigate();
-  const handleLink = (target: string): void => {
-    navigate(`/admin/${target}`);
-  };
-
-  const [responseData, setResponseData] = useState(null);
+  // const [responseData, setResponseData] = useState(null);
+  const adminId = tokenAdminId()
 
   useEffect(() => {
     fetchData();
@@ -29,10 +22,10 @@ const Dashboard = () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_dashboard.php`, {
         action: 'getDashboardList',
-        aid: parseInt(decodedAccessToken.id, 10)
+        aid: adminId
       });
       console.log(response.data.result)
-      setResponseData(response.data.result);
+      // setResponseData(response.data.result);
     } catch (error) {
       console.error(error);
     }
@@ -49,7 +42,7 @@ const Dashboard = () => {
           <h2 className="text-center mb-3">Dashboard</h2>
 
           <div className="row text-center">
-          {responseData ? (
+          {/* {responseData ? (
             <>
               {responseData.cnt_delivery && (
                 <div className="col">
@@ -62,9 +55,9 @@ const Dashboard = () => {
                 </div>
               )}
             </>
-          ) : (
+          ) : ( */}
             <p>Loading...</p>
-          )}
+          {/* )} */}
           </div>
         </div>
         <div className="col"></div>

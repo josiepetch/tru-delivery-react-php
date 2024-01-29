@@ -18,7 +18,6 @@ export const setAccessToken = (token: string) => {
 export const decodeToken = (token: string | null): object | null => {
     try {
         if (token) {
-            // console.log(jwtDecode(token));
             return jwtDecode(token);
         }
         return null;
@@ -30,7 +29,6 @@ export const decodeToken = (token: string | null): object | null => {
 export const decodeAccessToken = (accesstoken: string | null): object | null => {
     try {
         if (accesstoken) {
-            // console.log(jwtDecode(accesstoken));
             return jwtDecode(accesstoken);
         }
         return null;
@@ -48,4 +46,37 @@ export const getAndDecodeToken = (): object | null => {
 export const getAndDecodeAccessToken = (): object | null => {
     const accesstoken = getAccessToken();
     return decodeAccessToken(accesstoken);
+};
+
+export const tokenSupplierId = (): number | null => {
+    const token = decodeToken(getToken());
+    if (token && typeof token === 'object' && 'id' in token) {
+        return (token as { id: number }).id; // Type assertion here
+    } else {
+        return null;
+    }
+};
+export const tokenSupplierExpired = (): Date | null => {
+    const token = decodeToken(getToken());
+    if (token && typeof token === 'object' && 'expired' in token) {
+        return (token as { expired: Date }).expired; // Type assertion here
+    } else {
+        return null;
+    }
+};
+export const tokenAdminId = (): number | null => {
+    const token = decodeAccessToken(getAccessToken());
+    if (token && typeof token === 'object' && 'id' in token) {
+        return (token as { id: number }).id; // Type assertion here
+    } else {
+        return null;
+    }
+};
+export const tokenAdminExpired = (): Date | null => {
+    const token = decodeAccessToken(getAccessToken());
+    if (token && typeof token === 'object' && 'expired' in token) {
+        return (token as { expired: Date }).expired; // Type assertion here
+    } else {
+        return null;
+    }
 };

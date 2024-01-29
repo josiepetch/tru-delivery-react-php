@@ -1,15 +1,32 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Breadcrump from "./Breadcrump"
-import { AuthContext } from "../contexts/AuthContext";
+import { tokenSupplierId } from '../common/authUtils';
 
 const MyBookingDelete = () => {
-  const { decodedToken } = useContext(AuthContext);
 
   const { id } = useParams();
-  const [responseData, setResponseData] = useState(null);
+  interface ResponseData {
+    po_number: string;
+    booktime: Date;
+    format_booktime: string;
+    type_title: string;
+    item: number;
+    type: number;
+    note: string;
+  }
+  const [responseData, setResponseData] = useState<ResponseData>({
+    po_number: '',
+    booktime: new Date(),
+    format_booktime: '',
+    type_title: '',
+    item: 0,
+    type: 0,
+    note: '',
+  });
   const [isBtnLoading, setIsBtnLoading] = useState(false);
+  const supplierId = tokenSupplierId()
 
   const navigate = useNavigate();
   const handleLink = (target: string): void => {
@@ -38,7 +55,7 @@ const MyBookingDelete = () => {
       setIsBtnLoading(true);
       axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/frontend_delivery.php`, {
           action: 'deletebooking',
-          sid: parseInt(decodedToken.id, 10),
+          sid: supplierId,
           id,
       }).then(function(response){
           if (response.data.status === 200) {

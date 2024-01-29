@@ -1,12 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
+import { tokenAdminId } from "../../common/authUtils";
 
 const SupplierInsert = () => {
-
-    const { decodedAccessToken } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -23,6 +21,7 @@ const SupplierInsert = () => {
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [emailError, setEmailError] = useState(false);
     const [isBtnLoading, setIsBtnLoading] = useState(false);
+    const adminId = tokenAdminId()
 
     const handleIncrease = (index : number) => {
         setLength(length+index)
@@ -31,7 +30,7 @@ const SupplierInsert = () => {
         setLength(length-index)
     }
 
-    const handleSupplierChange = (e) => {
+    const handleSupplierChange = (e : any) => {
         const newSupplier = e.target.value;
         setSupplier(newSupplier);
     
@@ -40,7 +39,7 @@ const SupplierInsert = () => {
         setIsValidSupplier(nameRegex.test(newSupplier));
     };
 
-    const handleContactChange = (e) => {
+    const handleContactChange = (e : any) => {
         const newContact = e.target.value;
         setContact(newContact);
     
@@ -49,7 +48,7 @@ const SupplierInsert = () => {
         setIsValidContact(nameRegex.test(newContact));
     };
 
-    const handleEmailChange = (e) => {
+    const handleEmailChange = (e : any) => {
         const newEmail = e.target.value;
         setEmail(newEmail);
     
@@ -70,7 +69,7 @@ const SupplierInsert = () => {
             setIsBtnLoading(true);
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_supplier.php`, {
                 action: 'insertSupplier',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 supplier,
                 contact,
                 email,

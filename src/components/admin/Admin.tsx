@@ -1,19 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar"
-import { AuthContext } from "../../contexts/AuthContext";
-import React from "react";
+import { tokenAdminId } from "../../common/authUtils";
 
 const Admin = () => {
-
-    const { decodedAccessToken } = useContext(AuthContext);
-
-    useEffect(() => {
-        if (!decodedAccessToken) {
-            handleLink('login')
-        }
-    });
 
     const navigate = useNavigate();
     const handleLink = (target: string): void => {
@@ -36,17 +27,18 @@ const Admin = () => {
         }
     }, []);
 
-    const [expandedItemId, setExpandedItemId] = useState('');
+    const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
     const [length, setLength] = useState(12);
-    const [successResetMap, setSuccessResetMap] = useState({})
-    const [failResetMap, setFailResetMap] = useState({})
-    const [responseData, setResponseData] = useState(null);
+    const [successResetMap, setSuccessResetMap] = useState<any[]>([]);
+    const [failResetMap, setFailResetMap] = useState<any[]>([]);
+    const [responseData, setResponseData] = useState<any[]>([]);
+    const adminId = tokenAdminId()
 
     const fetchData = async () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                 action: 'getAdminList',
-                aid: parseInt(decodedAccessToken.id, 10)
+                aid: adminId
             });
             setResponseData(response.data.result);
         } catch (error) {
@@ -54,8 +46,8 @@ const Admin = () => {
         }
     }
 
-    const handleClick = (id: null) => {
-        setExpandedItemId((prevId) => (prevId === id ? null : id));
+    const handleClick = (id: number | null) => {
+        setExpandedItemId((prevId : number | null) => (prevId === id ? null : id));
     };
 
     const handleIncrease = (index : number) => {
@@ -69,7 +61,7 @@ const Admin = () => {
         try {
             axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                 action: 'updateAdmin',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 length
             }).then(function(response){
@@ -94,7 +86,7 @@ const Admin = () => {
         try {
             await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                 action: 'setActiveDeactive',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 newStatus
             });
@@ -109,7 +101,7 @@ const Admin = () => {
         try {
             await axios.post(`${import.meta.env.VITE_REACT_BASE_URL}/api/backend_admin.php`, {
                 action: 'deleteAdmin',
-                aid: parseInt(decodedAccessToken.id, 10),
+                aid: adminId,
                 id,
                 username
             });
@@ -138,7 +130,7 @@ const Admin = () => {
     }, []);
 
     // inline css
-    const textTitle = {
+    const textTitle: CSSProperties = {
         textAlign: 'right',
         fontWeight: 'bold',
         paddingTop: '5px'
